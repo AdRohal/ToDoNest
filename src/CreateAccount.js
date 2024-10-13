@@ -102,8 +102,8 @@ function CreateAccount() {
               />
               <button
                 type="button"
-                className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5"
-                style={{ top: '-25%' }}
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5 text-gray-400"
+                style={{ top: '40%', transform: 'translateY(-50%)' }}
                 onClick={() => setShowPassword(!showPassword)}
               >
                 <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />

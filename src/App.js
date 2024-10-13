@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './App.css';
 import Login from './Login';
@@ -9,6 +9,7 @@ import BackgroundWrapper from './BackgroundWrapper';
 function Welcome() {
   const [user, setUser] = useState(null);
   const userId = localStorage.getItem('userId');
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -28,21 +29,28 @@ function Welcome() {
   }, [userId]);
 
   if (!user) {
-    return <div>Loading...</div>;
+    return (
+      <BackgroundWrapper>
+        <div className="flex flex-col items-center justify-center h-screen text-white text-center">
+          <h2 className="text-2xl font-bold mb-6">Please login first to access this page!!</h2>
+          <button onClick={() => navigate('/login')} className="px-4 py-2 bg-blue-500 text-white rounded">Go to Login</button>
+        </div>
+      </BackgroundWrapper>
+    );
   }
 
   const handleLogout = () => {
     localStorage.removeItem('userId');
-    window.location.reload();
+    navigate('/login');
   };
 
   return (
     <BackgroundWrapper>
-      <header style={{ backgroundColor: 'transparent', display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem' }}>
-        <img src="/Logo_Header.png" alt="Logo" style={{ height: '40px' }} />
-        <button onClick={handleLogout} style={{ padding: '0.5rem 1rem', backgroundColor: '#f00', color: '#fff', border: 'none', borderRadius: '5px' }}>Log Out</button>
+      <header className="bg-transparent flex justify-between items-center p-4">
+        <img src="/Logo_Header.png" alt="Logo" className="h-10" />
+        <button onClick={handleLogout} className="px-4 py-2 bg-red-500 text-white rounded">Log Out</button>
       </header>
-      <div className="bg-white p-8 rounded shadow-md w-full max-w-md">
+      <div className="bg-[#10082b] p-8 rounded shadow-md w-full max-w-md mx-auto text-white">
         <h2 className="text-2xl font-bold mb-6 text-center">Welcome to ToDoNest, {user.full_name}</h2>
       </div>
     </BackgroundWrapper>

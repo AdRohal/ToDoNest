@@ -6,7 +6,7 @@ import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import BackgroundWrapper from './BackgroundWrapper';
 
 function Login() {
-  const [identifier, setIdentifier] = useState(''); // Changed from email to identifier
+  const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
@@ -35,12 +35,12 @@ function Login() {
 
   return (
     <BackgroundWrapper>
-      <div className="bg-white p-8 rounded shadow-md w-full max-w-md">
+      <div className="bg-[#10082b] p-8 rounded shadow-md w-full max-w-md text-white">
         <h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
         {error && <div className="mb-4 text-red-500">{error}</div>}
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="identifier">
+            <label className="block text-gray-300 text-sm font-bold mb-2" htmlFor="identifier">
               Email or Username
             </label>
             <input
@@ -53,7 +53,7 @@ function Login() {
             />
           </div>
           <div className="mb-6 relative">
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="password">
+            <label className="block text-gray-300 text-sm font-bold mb-2" htmlFor="password">
               Password
             </label>
             <div className="relative">
@@ -67,8 +67,8 @@ function Login() {
               />
               <button
                 type="button"
-                className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5"
-                style={{ top: '-25%' }}
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5 text-gray-400"
+                style={{ top: '40%', transform: 'translateY(-50%)' }}
                 onClick={() => setShowPassword(!showPassword)}
               >
                 <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
