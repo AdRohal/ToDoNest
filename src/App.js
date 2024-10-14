@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { BrowserRouter as Router, Route, Routes, useNavigate } from 'react-router-dom';
+import { Route, Routes, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './App.css';
 import Login from './Login';
+import Header from './component/Header';
 import CreateAccount from './CreateAccount';
 import BackgroundWrapper from './BackgroundWrapper';
+import Welcome from './Welcome'; // Import the Welcome component
 
-function Welcome() {
+function App() {
   const [user, setUser] = useState(null);
   const userId = localStorage.getItem('userId');
   const navigate = useNavigate();
@@ -28,45 +30,27 @@ function Welcome() {
     }
   }, [userId]);
 
-  if (!user) {
-    return (
-      <BackgroundWrapper>
-        <div className="flex flex-col items-center justify-center h-screen text-white text-center">
-          <h2 className="text-2xl font-bold mb-6">Please login first to access this page!!</h2>
-          <button onClick={() => navigate('/login')} className="px-4 py-2 bg-blue-500 text-white rounded">Go to Login</button>
-        </div>
-      </BackgroundWrapper>
-    );
-  }
+  const setView = (view) => {
+    navigate(`/${view}`);
+  };
 
   const handleLogout = () => {
     localStorage.removeItem('userId');
+    localStorage.removeItem('token');
+    setUser(null);
     navigate('/login');
   };
 
   return (
     <BackgroundWrapper>
-      <header className="bg-transparent flex justify-between items-center p-4">
-        <img src="/Logo_Header.png" alt="Logo" className="h-10" />
-        <button onClick={handleLogout} className="px-4 py-2 bg-red-500 text-white rounded">Log Out</button>
-      </header>
-      <div className="bg-[#10082b] p-8 rounded shadow-md w-full max-w-md mx-auto text-white">
-        <h2 className="text-2xl font-bold mb-6 text-center">Welcome to ToDoNest, {user.full_name}</h2>
-      </div>
-    </BackgroundWrapper>
-  );
-}
-
-function App() {
-  return (
-    <Router>
+      <Header user={user} setView={setView} handleLogout={handleLogout} />
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/create-account" element={<CreateAccount />} />
-        <Route path="/welcome" element={<Welcome />} />
+        <Route path="/welcome" element={<Welcome user={user} />} /> {/* Pass user as a prop */}
         <Route path="/" element={<Login />} />
       </Routes>
-    </Router>
+    </BackgroundWrapper>
   );
 }
 

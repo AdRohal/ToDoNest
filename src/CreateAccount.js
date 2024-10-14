@@ -43,13 +43,13 @@ function CreateAccount() {
 
   return (
     <BackgroundWrapper>
-      <div className="bg-white p-8 rounded shadow-md w-full max-w-md">
+      <div className="bg-[#10082b] p-8 rounded shadow-md w-full max-w-md text-white border border-white">
         <h2 className="text-2xl font-bold mb-6 text-center">Create Account</h2>
         {message && <div className="mb-4 text-green-500">{message}</div>}
         {error && <div className="mb-4 text-red-500">{error}</div>}
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="fullName">
+            <label className="block text-gray-300 text-sm font-bold mb-2" htmlFor="fullName">
               Full Name
             </label>
             <input
@@ -62,7 +62,7 @@ function CreateAccount() {
             />
           </div>
           <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="username">
+            <label className="block text-gray-300 text-sm font-bold mb-2" htmlFor="username">
               Username
             </label>
             <input
@@ -75,7 +75,7 @@ function CreateAccount() {
             />
           </div>
           <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">
+            <label className="block text-gray-300 text-sm font-bold mb-2" htmlFor="email">
               Email
             </label>
             <input
@@ -88,7 +88,7 @@ function CreateAccount() {
             />
           </div>
           <div className="mb-6 relative">
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="password">
+            <label className="block text-gray-300 text-sm font-bold mb-2" htmlFor="password">
               Password
             </label>
             <div className="relative flex items-center">
@@ -113,7 +113,7 @@ function CreateAccount() {
           <div className="flex items-center justify-between">
             <button
               type="submit"
-              className="bg-blue-500 hover:bg-white hover:text-blue-500 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
             >
               Create Account
             </button>

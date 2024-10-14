@@ -35,7 +35,7 @@ function Login() {
 
   return (
     <BackgroundWrapper>
-      <div className="bg-[#10082b] p-8 rounded shadow-md w-full max-w-md text-white">
+      <div className="bg-[#10082b] p-8 rounded shadow-md w-full max-w-md text-white border border-white">
         <h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
         {error && <div className="mb-4 text-red-500">{error}</div>}
         <form onSubmit={handleSubmit}>
