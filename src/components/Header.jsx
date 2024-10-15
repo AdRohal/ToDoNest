@@ -1,16 +1,23 @@
 import React, { useState } from "react";
+import { useNavigate } from 'react-router-dom';
 import logo from "../../src/images/Logo_Header.png";
 import accIco from "../../src/images/icons8-account-48.png";
 
 const Header = ({ user, setView, handleLogout }) => {
     const [dropdownOpen, setDropdownOpen] = useState(false);
+    const navigate = useNavigate();
+
+    const handleProfileClick = () => {
+        setDropdownOpen(false);
+        navigate('/profile');
+    };
 
     return (
         <header className="bg-transparent w-full fixed top-0 left-0 z-5">
             <div className="container mx-auto flex justify-between items-center p-1">
                 {/* Logo */}
                 <div className="flex items-center space-x-6">
-                    <img src={logo} alt="Logo" className="h-24 cursor-pointer" onClick={() => setView('app')} />
+                    <img src={logo} alt="Logo" className="h-24 cursor-pointer" onClick={() => setView('Welcome')} />
                 </div>
 
                 {/* Right icons (Account, Favorites, Cart) */}
@@ -27,7 +34,10 @@ const Header = ({ user, setView, handleLogout }) => {
                             {dropdownOpen && (
                                 <div className=" bg-[#10082b] text-white absolute right-0 mt-2 w-48 bg-white rounded shadow-lg z-10">
                                     <ul className="bg-[#10082b] text-white py-1">
-                                        <li className="bg-[#10082b] text-white block px-4 py-2 text-sm hover:bg-[#4c3f75] cursor-pointer">
+                                        <li
+                                            className="bg-[#10082b] text-white block px-4 py-2 text-sm hover:bg-[#4c3f75] cursor-pointer"
+                                            onClick={handleProfileClick}
+                                        >
                                             Profile
                                         </li>
                                         <li className="bg-[#10082b] text-white block px-4 py-2 text-sm hover:bg-[#4c3f75] cursor-pointer">

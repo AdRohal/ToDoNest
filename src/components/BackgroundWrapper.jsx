@@ -1,5 +1,4 @@
-import React from 'react';
-import './App.css';
+import '../styles/App.css';
 
 const BackgroundWrapper = ({ children }) => {
   return <div className="background">{children}</div>;

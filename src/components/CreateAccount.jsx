@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import './App.css';
+import '../styles/App.css';
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
-import BackgroundWrapper from './BackgroundWrapper';
+import BackgroundWrapper from '../components/BackgroundWrapper';
 
 function CreateAccount() {
   const [fullName, setFullName] = useState('');
@@ -31,7 +31,7 @@ function CreateAccount() {
       setMessage('Account created successfully!');
       setTimeout(() => {
         navigate('/welcome', { state: { user } });
-      }, 2000); // Redirect after 2 seconds
+      }, 2000);
     } catch (err) {
       if (err.response && err.response.data && err.response.data.error) {
         setError(err.response.data.error);

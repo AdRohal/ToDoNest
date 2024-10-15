@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
-import BackgroundWrapper from './BackgroundWrapper';
+import BackgroundWrapper from '../components/BackgroundWrapper';
 
 function Login() {
   const [identifier, setIdentifier] = useState('');

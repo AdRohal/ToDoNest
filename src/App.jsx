@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { Route, Routes, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import './App.css';
-import Login from './Login';
-import Header from './component/Header';
-import CreateAccount from './CreateAccount';
-import BackgroundWrapper from './BackgroundWrapper';
-import Welcome from './Welcome'; // Import the Welcome component
+import './styles/App.css';
+import Login from './components/Login';
+import Header from './components/Header';
+import CreateAccount from './components/CreateAccount';
+import BackgroundWrapper from './components/BackgroundWrapper';
+import Welcome from './components/Welcome';
+import Profile from './components/Profile'; // Import Profile component
 
 function App() {
   const [user, setUser] = useState(null);
@@ -47,7 +48,8 @@ function App() {
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/create-account" element={<CreateAccount />} />
-        <Route path="/welcome" element={<Welcome user={user} />} /> {/* Pass user as a prop */}
+        <Route path="/welcome" element={<Welcome user={user} />} />
+        <Route path="/profile" element={<Profile />} /> {/* Add Profile route */}
         <Route path="/" element={<Login />} />
       </Routes>
     </BackgroundWrapper>
