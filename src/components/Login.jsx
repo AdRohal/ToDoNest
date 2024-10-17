@@ -3,9 +3,9 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
-import BackgroundWrapper from '../components/BackgroundWrapper';
+import BackgroundWrapper from './BackgroundWrapper';
 
-function Login() {
+const Login = ({ setUser }) => {
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -22,6 +22,13 @@ function Login() {
       console.log('Login successful, token:', token, 'userId:', userId);
       localStorage.setItem('token', token);
       localStorage.setItem('userId', userId);
+
+      const userResponse = await axios.get(`http://localhost:5000/api/user/${userId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setUser(userResponse.data.user);
       navigate('/welcome');
     } catch (err) {
       console.error('Login failed:', err);
@@ -90,6 +97,6 @@ function Login() {
       </div>
     </BackgroundWrapper>
   );
-}
+};
 
 export default Login;

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import logo from "../../src/images/Logo_Header.png";
 import accIco from "../../src/images/icons8-account-48.png";
 
-const Header = ({ user, setView, handleLogout }) => {
+const Header = ({ user, handleLogout }) => {
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const navigate = useNavigate();
 
@@ -12,12 +12,26 @@ const Header = ({ user, setView, handleLogout }) => {
         navigate('/profile');
     };
 
+    const handleLoginClick = () => {
+        setDropdownOpen(false);
+        navigate('/login');
+    };
+
+    const handleCreateAccountClick = () => {
+        setDropdownOpen(false);
+        navigate('/create-account');
+    };
+
+    const handleLogoClick = () => {
+        navigate('/welcome');
+    };
+
     return (
         <header className="bg-transparent w-full fixed top-0 left-0 z-5">
             <div className="container mx-auto flex justify-between items-center p-1">
                 {/* Logo */}
                 <div className="flex items-center space-x-6">
-                    <img src={logo} alt="Logo" className="h-24 cursor-pointer" onClick={() => setView('Welcome')} />
+                    <img src={logo} alt="Logo" className="h-24 cursor-pointer" onClick={handleLogoClick} />
                 </div>
 
                 {/* Right icons (Account, Favorites, Cart) */}
@@ -67,13 +81,13 @@ const Header = ({ user, setView, handleLogout }) => {
                                     <ul className="bg-[#10082b] text-white py-1">
                                         <li
                                             className="bg-[#10082b] text-white block px-4 py-2 text-sm hover:bg-[#4c3f75] cursor-pointer"
-                                            onClick={() => setView('login')}
+                                            onClick={handleLoginClick}
                                         >
                                             Log In
                                         </li>
                                         <li
                                             className="bg-[#10082b] text-white block px-4 py-2 text-sm hover:bg-[#4c3f75] cursor-pointer"
-                                            onClick={() => setView('create-account')}
+                                            onClick={handleCreateAccountClick}
                                         >
                                             Create Account
                                         </li>

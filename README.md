@@ -72,3 +72,52 @@ This section has moved here: https://facebook.github.io/create-react-app/docs/ma
 
 Advanced Configuration
 This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration ```
+
+### Backend
+Navigate to the backend directory and start the Express server:
+
+```bash
+cd backend
+npm install
+npm start
+```
+The backend server will run on http://localhost:5000.
+
+### Database
+Ensure PostgreSQL is running and create the `users` table:
+
+```sql
+CREATE TABLE users (
+  id SERIAL PRIMARY KEY,
+  full_name VARCHAR(255) NOT NULL,
+  username VARCHAR(255) NOT NULL UNIQUE,
+  email VARCHAR(255) NOT NULL UNIQUE,
+  password VARCHAR(255) NOT NULL,
+  avatar BYTEA,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE categories (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(255) NOT NULL,
+  user_id INTEGER REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE TABLE tasks (
+  id SERIAL PRIMARY KEY,
+  title VARCHAR(255) NOT NULL,
+  description TEXT,
+  completed BOOLEAN DEFAULT FALSE,
+  category_id INTEGER REFERENCES categories(id) ON DELETE CASCADE,
+  user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+### Environment Variables
+Create a `.env` file in the backend directory with the following content:
+
+```
+JWT_SECRET=your_jwt_secret
+DATABASE_URL=postgres://postgres:5233@localhost:5432/todonest
+```

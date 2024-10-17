@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Route, Routes, useNavigate } from 'react-router-dom';
+import { Route, Routes, useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import './styles/App.css';
 import Login from './components/Login';
@@ -11,29 +11,8 @@ import Profile from './components/Profile'; // Import Profile component
 
 function App() {
   const [user, setUser] = useState(null);
-  const userId = localStorage.getItem('userId');
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const response = await axios.get(`http://localhost:5000/api/user/${userId}`);
-        setUser(response.data.user);
-      } catch (err) {
-        console.error('Failed to fetch user', err);
-      }
-    };
-
-    if (userId) {
-      fetchUser();
-    } else {
-      console.error('No userId found in localStorage');
-    }
-  }, [userId]);
-
-  const setView = (view) => {
-    navigate(`/${view}`);
-  };
+  const location = useLocation();
 
   const handleLogout = () => {
     localStorage.removeItem('userId');
@@ -42,15 +21,42 @@ function App() {
     navigate('/login');
   };
 
+  useEffect(() => {
+    const fetchUser = async () => {
+      const userId = localStorage.getItem('userId');
+      const token = localStorage.getItem('token');
+      if (userId && token) {
+        try {
+          const response = await axios.get(`http://localhost:5000/api/user/${userId}`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          setUser(response.data.user);
+          if (location.pathname === '/') {
+            navigate('/welcome');
+          }
+        } catch (err) {
+          console.error('Failed to fetch user', err);
+          handleLogout(); // Clear user state and redirect to login if fetching user fails
+        }
+      } else {
+        handleLogout(); // Clear user state and redirect to login if no userId or token
+      }
+    };
+
+    fetchUser();
+  }, [navigate, location.pathname]);
+
   return (
     <BackgroundWrapper>
-      <Header user={user} setView={setView} handleLogout={handleLogout} />
+      <Header user={user} handleLogout={handleLogout} />
       <Routes>
-        <Route path="/login" element={<Login />} />
+        <Route path="/login" element={<Login setUser={setUser} />} />
         <Route path="/create-account" element={<CreateAccount />} />
         <Route path="/welcome" element={<Welcome user={user} />} />
-        <Route path="/profile" element={<Profile />} /> {/* Add Profile route */}
-        <Route path="/" element={<Login />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/" element={<Login setUser={setUser} />} />
       </Routes>
     </BackgroundWrapper>
   );

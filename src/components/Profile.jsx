@@ -23,7 +23,11 @@ function Profile() {
 
     const fetchUserProfile = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/api/user/${userId}`);
+        const response = await axios.get(`http://localhost:5000/api/user/${userId}`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          },
+        });
         const { full_name, username, email, avatar } = response.data.user;
         setFullName(full_name);
         setUsername(username);
@@ -61,13 +65,18 @@ function Profile() {
     };
 
     try {
-      await axios.put(`http://localhost:5000/api/user/${userId}`, profileData);
+      await axios.put(`http://localhost:5000/api/user/${userId}`, profileData, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
 
       if (avatar) {
         const formData = new FormData();
         formData.append('avatar', avatar);
         await axios.post(`http://localhost:5000/api/user/${userId}/avatar`, formData, {
           headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
             'Content-Type': 'multipart/form-data',
           },
         });
@@ -86,7 +95,7 @@ function Profile() {
 
   return (
     <BackgroundWrapper>
-      <div className="bg-[#10082b] p-8 rounded shadow-md w-full max-w-md text-white border border-white">
+      <div className="bg-[#10082b] rounded shadow-md p-8 w-[1000px] text-white border border-white">
         <h2 className="text-2xl font-bold mb-6 text-center">Profile Management</h2>
         {message && <div className="mb-4 text-green-500">{message}</div>}
         {error && <div className="mb-4 text-red-500">{error}</div>}
