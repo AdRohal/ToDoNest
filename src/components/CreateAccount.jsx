@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import '../styles/App.css';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
-import BackgroundWrapper from '../components/BackgroundWrapper';
+import BackgroundWrapper from './BackgroundWrapper';
 
 function CreateAccount() {
   const [fullName, setFullName] = useState('');
@@ -117,12 +117,12 @@ function CreateAccount() {
             >
               Create Account
             </button>
-            <a
-              href="/login"
+            <Link
+              to="/login"
               className="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800"
             >
               Already have an account?
-            </a>
+            </Link>
           </div>
         </form>
       </div>

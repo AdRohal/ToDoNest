@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import BackgroundWrapper from './BackgroundWrapper';
@@ -89,9 +89,9 @@ const Login = ({ setUser }) => {
             >
               Sign In
             </button>
-            <a href="/create-account" className="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800">
+            <Link to="/create-account" className="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800">
               Create Account
-            </a>
+            </Link>
           </div>
         </form>
       </div>

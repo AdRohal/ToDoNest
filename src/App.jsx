@@ -7,7 +7,7 @@ import Header from './components/Header';
 import CreateAccount from './components/CreateAccount';
 import BackgroundWrapper from './components/BackgroundWrapper';
 import Welcome from './components/Welcome';
-import Profile from './components/Profile'; // Import Profile component
+import Profile from './components/Profile';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -38,10 +38,10 @@ function App() {
           }
         } catch (err) {
           console.error('Failed to fetch user', err);
-          handleLogout(); // Clear user state and redirect to login if fetching user fails
+          handleLogout();
         }
-      } else {
-        handleLogout(); // Clear user state and redirect to login if no userId or token
+      } else if (location.pathname !== '/create-account') {
+        handleLogout();
       }
     };
 
