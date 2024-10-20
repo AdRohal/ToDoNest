@@ -1,4 +1,9 @@
 # ToDoNest
+
+## About ToDoNest 📝
+
+ToDoNest is a web-based platform where users can securely create accounts, log in, and manage personalized to-do lists. ✅ Each user has their own task manager, allowing them to organize, prioritize, and track tasks easily. 📅 The project is still in progress, with more features to come, designed to enhance productivity and simplify task management. 🚀
+
 ### Frontend
 Navigate to the frontend directory and start the React application:
 
