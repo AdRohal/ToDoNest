@@ -8,6 +8,7 @@ import CreateAccount from './components/CreateAccount';
 import BackgroundWrapper from './components/BackgroundWrapper';
 import Welcome from './components/Welcome';
 import Profile from './components/Profile';
+import TodoList from './components/TodoList';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -56,6 +57,7 @@ function App() {
         <Route path="/create-account" element={<CreateAccount />} />
         <Route path="/welcome" element={<Welcome user={user} />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/todo-list" element={<TodoList />} />
         <Route path="/" element={<Login setUser={setUser} />} />
       </Routes>
     </BackgroundWrapper>

@@ -20,6 +20,13 @@ function CreateAccount() {
     e.preventDefault();
     setMessage('');
     setError('');
+
+    // Check if all fields are filled
+    if (!fullName || !username || !email || !password) {
+      setError('All fields are required');
+      return;
+    }
+
     try {
       const response = await axios.post('http://localhost:5000/api/register', {
         full_name: fullName,

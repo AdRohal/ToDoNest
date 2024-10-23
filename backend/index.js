@@ -60,24 +60,33 @@ app.get('/api/user/:id', authenticateToken, async (req, res) => {
 // Endpoint to register a new user
 app.post('/api/register', async (req, res) => {
   const { full_name, username, email, password } = req.body;
+
+  // Check if all fields are provided
+  if (!full_name || !username || !email || !password) {
+    return res.status(400).json({ error: 'All fields are required' });
+  }
+
   const hashedPassword = await bcrypt.hash(password, 10);
   try {
     // Check if email is already registered
-    const userExists = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
-    if (userExists.rows.length > 0) {
+    const emailExists = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+    if (emailExists.rows.length > 0) {
       return res.status(400).json({ error: 'User with this email already exists' });
     }
+
     // Check if username is already taken
     const usernameExists = await pool.query('SELECT * FROM users WHERE username = $1', [username]);
     if (usernameExists.rows.length > 0) {
       return res.status(400).json({ error: 'Username already taken' });
     }
+
     // Register the user
     const result = await pool.query(
       'INSERT INTO users (full_name, username, email, password) VALUES ($1, $2, $3, $4) RETURNING id',
       [full_name, username, email, hashedPassword]
     );
     const user = result.rows[0];
+
     // Create a JWT token
     const token = jwt.sign({ id: user.id }, 'your_jwt_secret', { expiresIn: '1h' });
     res.status(201).json({ token, userId: user.id });
@@ -195,6 +204,115 @@ app.post('/api/user/:id/avatar', authenticateToken, upload.single('avatar'), asy
     res.status(200).json({ message: 'Avatar updated successfully' });
   } catch (err) {
     console.error('Error updating avatar:', err);
+    res.status(500).json({ error: 'An error occurred. Please try again.' });
+  }
+});
+
+// Endpoint to create a new category
+app.post('/api/category', authenticateToken, async (req, res) => {
+  const { name } = req.body;
+  const userId = req.user.id;
+
+  if (!name) {
+    return res.status(400).json({ error: 'Category name is required' });
+  }
+
+  try {
+    const result = await pool.query(
+      'INSERT INTO categories (name, user_id) VALUES ($1, $2) RETURNING id, name',
+      [name, userId]
+    );
+    res.status(201).json(result.rows[0]);
+  } catch (err) {
+    console.error('Error creating category:', err);
+    res.status(500).json({ error: 'An error occurred. Please try again.' });
+  }
+});
+
+// Endpoint to create a new task
+app.post('/api/task', authenticateToken, async (req, res) => {
+  const { categoryId, title, description } = req.body;
+  const userId = req.user.id;
+
+  if (!categoryId || !title) {
+    return res.status(400).json({ error: 'Category ID and title are required' });
+  }
+
+  try {
+    const result = await pool.query(
+      'INSERT INTO tasks (category_id, title, description, user_id) VALUES ($1, $2, $3, $4) RETURNING id, title, description, completed',
+      [categoryId, title, description, userId]
+    );
+    res.status(201).json(result.rows[0]);
+  } catch (err) {
+    console.error('Error creating task:', err);
+    res.status(500).json({ error: 'An error occurred. Please try again.' });
+  }
+});
+
+// Endpoint to fetch categories with tasks
+app.get('/api/categories', authenticateToken, async (req, res) => {
+  const userId = req.user.id;
+
+  try {
+    const result = await pool.query(`
+      SELECT c.id AS category_id, c.name AS category_name, t.id AS task_id, t.title AS task_title, t.description AS task_description, t.completed AS task_completed
+      FROM categories c
+      LEFT JOIN tasks t ON c.id = t.category_id
+      WHERE c.user_id = $1
+    `, [userId]);
+
+    const categories = result.rows.reduce((acc, row) => {
+      const category = acc.find(c => c.id === row.category_id);
+      if (category) {
+        if (row.task_id) {
+          category.tasks.push({
+            id: row.task_id,
+            title: row.task_title,
+            description: row.task_description,
+            completed: row.task_completed
+          });
+        }
+      } else {
+        acc.push({
+          id: row.category_id,
+          name: row.category_name,
+          tasks: row.task_id ? [{
+            id: row.task_id,
+            title: row.task_title,
+            description: row.task_description,
+            completed: row.task_completed
+          }] : []
+        });
+      }
+      return acc;
+    }, []);
+
+    res.json(categories);
+  } catch (err) {
+    console.error('Error fetching categories:', err);
+    res.status(500).json({ error: 'An error occurred. Please try again.' });
+  }
+});
+
+// Endpoint to toggle task completion
+app.put('/api/task/:id', authenticateToken, async (req, res) => {
+  const { id } = req.params;
+  const { completed } = req.body;
+
+  try {
+    const result = await pool.query(
+      'UPDATE tasks SET completed = $1 WHERE id = $2 RETURNING id, title, description, completed',
+      [completed, id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Task not found' });
+    }
+
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error('Error toggling task:', err);
     res.status(500).json({ error: 'An error occurred. Please try again.' });
   }
 });
