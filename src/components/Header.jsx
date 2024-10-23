@@ -27,7 +27,7 @@ const Header = ({ user, handleLogout }) => {
     };
 
     return (
-        <header className="bg-transparent w-full fixed top-0 left-0 z-5">
+        <header className="bg-[#06021d] w-full fixed top-0 left-0 z-50 shadow-md">
             <div className="container mx-auto flex justify-between items-center p-1">
                 {/* Logo */}
                 <div className="flex items-center space-x-6">

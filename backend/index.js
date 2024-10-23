@@ -229,6 +229,37 @@ app.post('/api/category', authenticateToken, async (req, res) => {
   }
 });
 
+// Endpoint to update category name
+app.put('/api/category/:id', authenticateToken, async (req, res) => {
+  const { id } = req.params;
+  const { name } = req.body;
+  const userId = req.user.id;
+
+  console.log(`Updating category ${id} to ${name} for user ${userId}`); // Add logging
+
+  if (!name) {
+    return res.status(400).json({ error: 'Category name is required' });
+  }
+
+  try {
+    const result = await pool.query(
+      'UPDATE categories SET name = $1 WHERE id = $2 AND user_id = $3 RETURNING id, name',
+      [name, id, userId]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Category not found' });
+    }
+
+    console.log('Update result:', result.rows[0]); // Add logging
+
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error('Error updating category:', err);
+    res.status(500).json({ error: 'An error occurred. Please try again.' });
+  }
+});
+
 // Endpoint to create a new task
 app.post('/api/task', authenticateToken, async (req, res) => {
   const { categoryId, title, description } = req.body;
@@ -313,6 +344,29 @@ app.put('/api/task/:id', authenticateToken, async (req, res) => {
     res.json(result.rows[0]);
   } catch (err) {
     console.error('Error toggling task:', err);
+    res.status(500).json({ error: 'An error occurred. Please try again.' });
+  }
+});
+
+// Endpoint to delete a category
+app.delete('/api/category/:id', authenticateToken, async (req, res) => {
+  const { id } = req.params;
+  const userId = req.user.id;
+
+  try {
+    // Delete tasks associated with the category
+    await pool.query('DELETE FROM tasks WHERE category_id = $1 AND user_id = $2', [id, userId]);
+
+    // Delete the category
+    const result = await pool.query('DELETE FROM categories WHERE id = $1 AND user_id = $2 RETURNING id', [id, userId]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Category not found' });
+    }
+
+    res.json({ message: 'Category and associated tasks deleted successfully' });
+  } catch (err) {
+    console.error('Error deleting category:', err);
     res.status(500).json({ error: 'An error occurred. Please try again.' });
   }
 });
