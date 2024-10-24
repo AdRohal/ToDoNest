@@ -7,9 +7,12 @@ function TodoList() {
   const [newTaskTitle, setNewTaskTitle] = useState('');
   const [newTaskDescription, setNewTaskDescription] = useState('');
   const [addingCategory, setAddingCategory] = useState(false);
-  const [addingTaskCategory, setAddingTaskCategory] = useState(null); // Track which category is adding a new task
-  const [editingCategory, setEditingCategory] = useState(null); // Track which category is being renamed
+  const [addingTaskCategory, setAddingTaskCategory] = useState(null);
+  const [editingCategory, setEditingCategory] = useState(null);
   const [editedCategoryName, setEditedCategoryName] = useState('');
+  const [editingTask, setEditingTask] = useState(null);
+  const [editedTaskTitle, setEditedTaskTitle] = useState('');
+  const [editedTaskDescription, setEditedTaskDescription] = useState(''); 
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -165,6 +168,55 @@ function TodoList() {
     }
   };
 
+  const handleEditTask = (task, categoryId) => {
+    setEditingTask({ id: task.id, categoryId, completed: task.completed });
+    setEditedTaskTitle(task.title);
+    setEditedTaskDescription(task.description);
+  };
+  
+  const handleUpdateTask = async (taskId) => {
+    if (editedTaskTitle === '' && editedTaskDescription === '' && editingTask.completed === undefined) return;
+  
+    try {
+      const response = await fetch(`http://localhost:5000/api/task/${taskId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`, // Use the token from localStorage
+        },
+        body: JSON.stringify({
+          title: editedTaskTitle || undefined,
+          description: editedTaskDescription || undefined,
+          completed: editingTask.completed,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update task');
+      }
+
+      const updatedTaskFromServer = await response.json();
+      // Update the state with the updated task
+      setCategories((prevCategories) =>
+        prevCategories.map((category) =>
+          category.id === editingTask.categoryId
+            ? {
+                ...category,
+                tasks: category.tasks.map((task) =>
+                  task.id === taskId ? updatedTaskFromServer : task
+                ),
+              }
+            : category
+        )
+      );
+      setEditingTask(null);
+      setEditedTaskTitle('');
+      setEditedTaskDescription('');
+    } catch (error) {
+      console.error('Error updating task:', error);
+    }
+  };
+
   return (
     <div className="container mx-auto p-4 mt-28">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -216,10 +268,32 @@ function TodoList() {
                     onChange={() => handleToggleTask(category.id, task.id)}
                     className="mr-2"
                   />
-                  <div>
-                    <div>{task.title}</div>
-                    <div className="text-sm text-gray-600">{task.description}</div>
-                  </div>
+                  {editingTask && editingTask.id === task.id ? (
+                    <div className="flex flex-col w-full">
+                      <input
+                        type="text"
+                        value={editedTaskTitle}
+                        onChange={(e) => setEditedTaskTitle(e.target.value)}
+                        className="border p-2 rounded w-full mb-2"
+                      />
+                      <textarea
+                        value={editedTaskDescription}
+                        onChange={(e) => setEditedTaskDescription(e.target.value)}
+                        className="border p-2 rounded w-full mb-2"
+                      />
+                      <button
+                        onClick={() => handleUpdateTask(task.id)}
+                        className="bg-blue-500 text-white p-2 rounded w-full hover:bg-blue-600 transition"
+                      >
+                        Save
+                      </button>
+                    </div>
+                  ) : (
+                    <div onDoubleClick={() => handleEditTask(task, category.id)}>
+                      <div>{task.title}</div>
+                      <div className="text-sm text-gray-600">{task.description}</div>
+                    </div>
+                  )}
                 </li>
               ))}
               {addingTaskCategory === category.id && (

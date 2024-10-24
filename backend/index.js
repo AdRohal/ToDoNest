@@ -41,13 +41,12 @@ app.get('/api/user/:id', authenticateToken, async (req, res) => {
   try {
     const result = await pool.query('SELECT id, full_name, username, email, avatar FROM users WHERE id = $1', [id]);
     if (result.rows.length === 0) {
-      console.log('User not found');
       return res.status(404).json({ error: 'User not found' });
     }
     const user = result.rows[0];
     // Convert the avatar buffer to a base64 string
     if (user.avatar) {
-      user.avatar = user.avatar.toString('base64'); // Convert buffer to base64
+      user.avatar = user.avatar.toString('base64');
     }
     console.log('User fetched:', user);
     res.json({ user });
@@ -71,13 +70,13 @@ app.post('/api/register', async (req, res) => {
     // Check if email is already registered
     const emailExists = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
     if (emailExists.rows.length > 0) {
-      return res.status(400).json({ error: 'User with this email already exists' });
+      return res.status(400).json({ error: 'Email is already registered' });
     }
 
     // Check if username is already taken
     const usernameExists = await pool.query('SELECT * FROM users WHERE username = $1', [username]);
     if (usernameExists.rows.length > 0) {
-      return res.status(400).json({ error: 'Username already taken' });
+      return res.status(400).json({ error: 'Username is already taken' });
     }
 
     // Register the user
@@ -103,14 +102,12 @@ app.post('/api/login', async (req, res) => {
   try {
     let result;
     if (identifier.includes('@')) {
-      // Login by email
-      result = await pool.query('SELECT id, password FROM users WHERE email = $1', [identifier]);
+      result = await pool.query('SELECT * FROM users WHERE email = $1', [identifier]);
     } else {
-      // Login by username
-      result = await pool.query('SELECT id, password FROM users WHERE username = $1', [identifier]);
+      result = await pool.query('SELECT * FROM users WHERE username = $1', [identifier]);
     }
     if (result.rows.length === 0) {
-      return res.status(400).json({ error: 'User not found' });
+      return res.status(400).json({ error: 'Invalid credentials' });
     }
     const user = result.rows[0];
     // Verify password
@@ -155,7 +152,7 @@ app.put('/api/user/:id', authenticateToken, async (req, res) => {
     }
 
     if (updateFields.length === 0) {
-      return res.status(400).json({ error: 'No fields to update' });
+      return res.status(400).json({ error: 'At least one field is required' });
     }
 
     updateValues.push(id);
@@ -367,6 +364,54 @@ app.delete('/api/category/:id', authenticateToken, async (req, res) => {
     res.json({ message: 'Category and associated tasks deleted successfully' });
   } catch (err) {
     console.error('Error deleting category:', err);
+    res.status(500).json({ error: 'An error occurred. Please try again.' });
+  }
+});
+
+// Endpoint to update task title, description, and completion status
+app.put('/api/task/:id', authenticateToken, async (req, res) => {
+  const { id } = req.params;
+  const { title, description, completed } = req.body;
+
+  if (title === undefined && description === undefined && completed === undefined) {
+    return res.status(400).json({ error: 'At least one of title, description, or completed is required' });
+  }
+
+  try {
+    const updateFields = [];
+    const updateValues = [];
+    let queryIndex = 1;
+
+    if (title !== undefined) {
+      updateFields.push(`title = $${queryIndex++}`);
+      updateValues.push(title);
+    }
+    if (description !== undefined) {
+      updateFields.push(`description = $${queryIndex++}`);
+      updateValues.push(description);
+    }
+    if (completed !== undefined) {
+      updateFields.push(`completed = $${queryIndex++}`);
+      updateValues.push(completed);
+    }
+
+    updateValues.push(id);
+    const updateQuery = `
+      UPDATE tasks
+      SET ${updateFields.join(', ')}
+      WHERE id = $${queryIndex}
+      RETURNING id, title, description, completed
+    `;
+
+    const result = await pool.query(updateQuery, updateValues);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Task not found' });
+    }
+
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error('Error updating task:', err);
     res.status(500).json({ error: 'An error occurred. Please try again.' });
   }
 });

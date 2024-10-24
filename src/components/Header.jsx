@@ -54,9 +54,6 @@ const Header = ({ user, handleLogout }) => {
                                         >
                                             Profile
                                         </li>
-                                        <li className="bg-[#10082b] text-white block px-4 py-2 text-sm hover:bg-[#4c3f75] cursor-pointer">
-                                            Settings
-                                        </li>
                                         <li
                                             className="bg-[#10082b] text-white block px-4 py-2 text-sm hover:bg-[#4c3f75] cursor-pointer"
                                             onClick={handleLogout}
