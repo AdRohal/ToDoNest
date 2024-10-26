@@ -125,6 +125,24 @@ function TodoList() {
     }
   };
 
+  const handleDeleteTask = async (taskId) => {
+    try {
+      await axios.delete(`http://localhost:5000/api/task/${taskId}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
+      setCategories((prevCategories) =>
+        prevCategories.map((category) => ({
+          ...category,
+          tasks: category.tasks.filter((task) => task.id !== taskId),
+        }))
+      );
+    } catch (err) {
+      console.error('Error deleting task:', err);
+    }
+  };
+
   // Handle renaming a category
   const handleDoubleClickCategory = (categoryId, categoryName) => {
     setEditingCategory(categoryId);
@@ -176,7 +194,7 @@ function TodoList() {
   
   const handleUpdateTask = async (taskId) => {
     if (editedTaskTitle === '' && editedTaskDescription === '' && editingTask.completed === undefined) return;
-  
+
     try {
       const response = await fetch(`http://localhost:5000/api/task/${taskId}`, {
         method: 'PUT',
@@ -259,41 +277,57 @@ function TodoList() {
                 &times;
               </button>
             </div>
-            <ul className="mb-4">
+            <ul className="mb-4 max-h-48 overflow-y-auto">
               {category.tasks.map((task) => (
-                <li key={task.id} className="text-gray-800 flex items-center">
-                  <input
-                    type="checkbox"
-                    checked={task.completed}
-                    onChange={() => handleToggleTask(category.id, task.id)}
-                    className="mr-2"
-                  />
-                  {editingTask && editingTask.id === task.id ? (
-                    <div className="flex flex-col w-full">
-                      <input
-                        type="text"
-                        value={editedTaskTitle}
-                        onChange={(e) => setEditedTaskTitle(e.target.value)}
-                        className="border p-2 rounded w-full mb-2"
-                      />
-                      <textarea
-                        value={editedTaskDescription}
-                        onChange={(e) => setEditedTaskDescription(e.target.value)}
-                        className="border p-2 rounded w-full mb-2"
-                      />
-                      <button
-                        onClick={() => handleUpdateTask(task.id)}
-                        className="bg-blue-500 text-white p-2 rounded w-full hover:bg-blue-600 transition"
-                      >
-                        Save
-                      </button>
-                    </div>
-                  ) : (
-                    <div onDoubleClick={() => handleEditTask(task, category.id)}>
-                      <div>{task.title}</div>
-                      <div className="text-sm text-gray-600">{task.description}</div>
-                    </div>
-                  )}
+                <li key={task.id} className="text-gray-800 flex items-center justify-between">
+                  <div className="flex items-center">
+                    <input
+                      type="checkbox"
+                      checked={task.completed}
+                      onChange={() => handleToggleTask(category.id, task.id)}
+                      className="mr-2"
+                    />
+                    {editingTask && editingTask.id === task.id ? (
+                      <div className="flex flex-col w-full">
+                        <input
+                          type="text"
+                          value={editedTaskTitle}
+                          onChange={(e) => setEditedTaskTitle(e.target.value)}
+                          className="border p-2 rounded w-full mb-2"
+                        />
+                        <textarea
+                          value={editedTaskDescription}
+                          onChange={(e) => setEditedTaskDescription(e.target.value)}
+                          className="border p-2 rounded w-full mb-2"
+                        />
+                        <button
+                          onClick={() => handleUpdateTask(task.id)}
+                          className="bg-blue-500 text-white p-2 rounded w-full hover:bg-blue-600 transition"
+                        >
+                          Save
+                        </button>
+                      </div>
+                    ) : (
+                      <div onDoubleClick={() => handleEditTask(task, category.id)}>
+                        <div>{task.title}</div>
+                        <div className="text-sm text-gray-600">{task.description}</div>
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex items-center">
+                    <button
+                      onClick={() => handleEditTask(task, category.id)}
+                      className="text-blue-500 hover:text-blue-700 transition mr-2"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => handleDeleteTask(task.id)}
+                      className="text-red-500 hover:text-red-700 transition"
+                    >
+                      Delete
+                    </button>
+                  </div>
                 </li>
               ))}
               {addingTaskCategory === category.id && (

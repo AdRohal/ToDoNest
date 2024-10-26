@@ -416,6 +416,32 @@ app.put('/api/task/:id', authenticateToken, async (req, res) => {
   }
 });
 
+// Endpoint to delete a task
+app.delete('/api/task/:id', authenticateToken, async (req, res) => {
+  const { id } = req.params;
+  const userId = req.user.id;
+
+  try {
+    // Ensure the task belongs to the user before deleting
+    const taskResult = await pool.query('SELECT * FROM tasks WHERE id = $1 AND user_id = $2', [id, userId]);
+
+    if (taskResult.rows.length === 0) {
+      return res.status(404).json({ error: 'Task not found or does not belong to the user' });
+    }
+
+    const deleteResult = await pool.query('DELETE FROM tasks WHERE id = $1 AND user_id = $2 RETURNING id', [id, userId]);
+
+    if (deleteResult.rows.length === 0) {
+      return res.status(404).json({ error: 'Task not found' });
+    }
+
+    res.json({ message: 'Task deleted successfully' });
+  } catch (err) {
+    console.error('Error deleting task:', err);
+    res.status(500).json({ error: 'An error occurred. Please try again.' });
+  }
+});
+
 // Start the server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
