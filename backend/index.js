@@ -324,7 +324,7 @@ app.get('/api/categories', authenticateToken, async (req, res) => {
 });
 
 // Endpoint to toggle task completion
-app.put('/api/task/:id', authenticateToken, async (req, res) => {
+app.put('/api/task/:id/completion', authenticateToken, async (req, res) => {
   const { id } = req.params;
   const { completed } = req.body;
 
@@ -403,6 +403,9 @@ app.put('/api/task/:id', authenticateToken, async (req, res) => {
       RETURNING id, title, description, completed
     `;
 
+    console.log('Update Query:', updateQuery); // Debugging log
+    console.log('Update Values:', updateValues); // Debugging log
+
     const result = await pool.query(updateQuery, updateValues);
 
     if (result.rows.length === 0) {
@@ -415,6 +418,7 @@ app.put('/api/task/:id', authenticateToken, async (req, res) => {
     res.status(500).json({ error: 'An error occurred. Please try again.' });
   }
 });
+
 
 // Endpoint to delete a task
 app.delete('/api/task/:id', authenticateToken, async (req, res) => {

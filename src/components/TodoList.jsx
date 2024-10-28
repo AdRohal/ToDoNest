@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import trashIcon from "../../src/images/trash-48.png";
 
 function TodoList() {
   const [categories, setCategories] = useState([]);
@@ -12,7 +13,8 @@ function TodoList() {
   const [editedCategoryName, setEditedCategoryName] = useState('');
   const [editingTask, setEditingTask] = useState(null);
   const [editedTaskTitle, setEditedTaskTitle] = useState('');
-  const [editedTaskDescription, setEditedTaskDescription] = useState(''); 
+  const [editedTaskDescription, setEditedTaskDescription] = useState('');
+  const [isPopupVisible, setIsPopupVisible] = useState(false); // New state for popup visibility
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -53,7 +55,10 @@ function TodoList() {
   };
 
   const handleCreateTask = async (categoryId) => {
-    if (!newTaskTitle) return;
+    if (!newTaskTitle.trim()) {
+      console.log("Task title is empty, cannot save");
+      return;
+    }
 
     try {
       const response = await axios.post(
@@ -65,6 +70,7 @@ function TodoList() {
           },
         }
       );
+
       setCategories(
         categories.map((category) =>
           category.id === categoryId
@@ -72,9 +78,10 @@ function TodoList() {
             : category
         )
       );
-      setNewTaskTitle(''); // Clear the input field after adding
-      setNewTaskDescription(''); // Clear the input field after adding
-      setAddingTaskCategory(categoryId); // Keep the input open for the same category
+      setNewTaskTitle('');
+      setNewTaskDescription('');
+      setAddingTaskCategory(null);
+      setIsPopupVisible(false); // Close the popup after saving
     } catch (err) {
       console.error('Error creating task:', err);
     }
@@ -190,31 +197,44 @@ function TodoList() {
     setEditingTask({ id: task.id, categoryId, completed: task.completed });
     setEditedTaskTitle(task.title);
     setEditedTaskDescription(task.description);
+    setIsPopupVisible(true);
   };
-  
+
+  const handleAddNewTask = (categoryId) => {
+    setAddingTaskCategory(categoryId);
+    setIsPopupVisible(true);
+  };
+
   const handleUpdateTask = async (taskId) => {
     if (editedTaskTitle === '' && editedTaskDescription === '' && editingTask.completed === undefined) return;
-
+  
     try {
-      const response = await fetch(`http://localhost:5000/api/task/${taskId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`, // Use the token from localStorage
-        },
-        body: JSON.stringify({
+      console.log('Sending update:', {
+        title: editedTaskTitle || undefined,
+        description: editedTaskDescription || undefined,
+        completed: editingTask.completed,
+      }); // Debugging log
+  
+      const response = await axios.put(
+        `http://localhost:5000/api/task/${taskId}`,
+        {
           title: editedTaskTitle || undefined,
           description: editedTaskDescription || undefined,
           completed: editingTask.completed,
-        }),
-      });
-
-      if (!response.ok) {
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          },
+        }
+      );
+  
+      if (!response.data) {
         throw new Error('Failed to update task');
       }
-
-      const updatedTaskFromServer = await response.json();
-      // Update the state with the updated task
+  
+      const updatedTaskFromServer = response.data;
       setCategories((prevCategories) =>
         prevCategories.map((category) =>
           category.id === editingTask.categoryId
@@ -230,25 +250,25 @@ function TodoList() {
       setEditingTask(null);
       setEditedTaskTitle('');
       setEditedTaskDescription('');
+      setIsPopupVisible(false);
     } catch (error) {
       console.error('Error updating task:', error);
     }
   };
-
+  
   return (
     <div className="container mx-auto p-4 mt-28">
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className={`grid grid-cols-1 md:grid-cols-4 gap-4 ${isPopupVisible ? 'blur-sm' : ''}`}>
         {categories.map((category) => (
           <div key={category.id} className="bg-white p-4 rounded-lg shadow-lg">
             <div className="flex justify-between items-center mb-2">
               {editingCategory === category.id ? (
-                // Edit mode: show input for renaming
                 <div className="relative w-full">
                   <input
                     type="text"
                     value={editedCategoryName}
                     onChange={(e) => setEditedCategoryName(e.target.value)}
-                    onKeyDown={(e) => handleKeyDown(e, category.id)} // Handle Enter or Escape
+                    onKeyDown={(e) => handleKeyDown(e, category.id)}
                     className="border p-2 rounded w-full pr-10"
                     autoFocus
                   />
@@ -260,7 +280,6 @@ function TodoList() {
                   </button>
                 </div>
               ) : (
-                // Normal mode: show category title, double-click to edit
                 <h3
                   className="text-xl font-bold cursor-pointer"
                   onDoubleClick={() =>
@@ -287,32 +306,10 @@ function TodoList() {
                       onChange={() => handleToggleTask(category.id, task.id)}
                       className="mr-2"
                     />
-                    {editingTask && editingTask.id === task.id ? (
-                      <div className="flex flex-col w-full">
-                        <input
-                          type="text"
-                          value={editedTaskTitle}
-                          onChange={(e) => setEditedTaskTitle(e.target.value)}
-                          className="border p-2 rounded w-full mb-2"
-                        />
-                        <textarea
-                          value={editedTaskDescription}
-                          onChange={(e) => setEditedTaskDescription(e.target.value)}
-                          className="border p-2 rounded w-full mb-2"
-                        />
-                        <button
-                          onClick={() => handleUpdateTask(task.id)}
-                          className="bg-blue-500 text-white p-2 rounded w-full hover:bg-blue-600 transition"
-                        >
-                          Save
-                        </button>
-                      </div>
-                    ) : (
-                      <div onDoubleClick={() => handleEditTask(task, category.id)}>
-                        <div>{task.title}</div>
-                        <div className="text-sm text-gray-600">{task.description}</div>
-                      </div>
-                    )}
+                    <div onDoubleClick={() => handleEditTask(task, category.id)}>
+                      <div>{task.title}</div>
+                      <div className="text-sm text-gray-600">{task.description}</div>
+                    </div>
                   </div>
                   <div className="flex items-center">
                     <button
@@ -325,50 +322,18 @@ function TodoList() {
                       onClick={() => handleDeleteTask(task.id)}
                       className="text-red-500 hover:text-red-700 transition"
                     >
-                      Delete
+                      <img width="24" height="24" src={trashIcon} alt="Trash" />
                     </button>
                   </div>
                 </li>
               ))}
-              {addingTaskCategory === category.id && (
-                <>
-                  <input
-                    type="text"
-                    placeholder="Task Title"
-                    value={newTaskTitle}
-                    onChange={(e) => setNewTaskTitle(e.target.value)}
-                    className="border p-2 rounded w-full mb-2"
-                  />
-                  <textarea
-                    placeholder="Task Description"
-                    value={newTaskDescription}
-                    onChange={(e) => setNewTaskDescription(e.target.value)}
-                    className="border p-2 rounded w-full mb-2"
-                  />
-                  <button
-                    onClick={() => handleCreateTask(category.id)}
-                    className="bg-blue-500 text-white p-2 rounded w-full hover:bg-blue-600 transition"
-                  >
-                    Add Task
-                  </button>
-                </>
-              )}
             </ul>
-            {addingTaskCategory === category.id ? (
-              <button
-                onClick={() => setAddingTaskCategory(null)}
-                className="bg-gray-200 text-gray-800 p-2 rounded w-full hover:bg-gray-300 transition"
-              >
-                Close Task Input
-              </button>
-            ) : (
-              <button
-                onClick={() => setAddingTaskCategory(category.id)}
-                className="bg-gray-200 text-gray-800 p-2 rounded w-full hover:bg-gray-300 transition"
-              >
-                Add New Task
-              </button>
-            )}
+            <button
+              onClick={() => handleAddNewTask(category.id)}
+              className="bg-gray-200 text-gray-800 p-2 rounded w-full hover:bg-gray-300 transition"
+            >
+              Add New Task
+            </button>
           </div>
         ))}
 
@@ -398,6 +363,48 @@ function TodoList() {
           </div>
         )}
       </div>
+
+      {/* Popup for editing task */}
+      {isPopupVisible && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-1/3">
+            <h2 className="text-xl font-bold mb-4">{editingTask ? 'Edit Task' : 'Add New Task'}</h2>
+            <input
+              type="text"
+              value={editingTask ? editedTaskTitle : newTaskTitle}
+              onChange={(e) => editingTask ? setEditedTaskTitle(e.target.value) : setNewTaskTitle(e.target.value)}
+              className="border p-2 rounded w-full mb-2"
+              placeholder="Task Title"
+            />
+            <textarea
+              value={editingTask ? editedTaskDescription : newTaskDescription}
+              onChange={(e) => editingTask ? setEditedTaskDescription(e.target.value) : setNewTaskDescription(e.target.value)}
+              className="border p-2 rounded w-full mb-2"
+              placeholder="Task Description"
+            />
+            <div className="flex justify-end">
+              <button
+                onClick={() => setIsPopupVisible(false)}
+                className="bg-gray-200 text-gray-800 p-2 rounded mr-2 hover:bg-gray-300 transition"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  if (editingTask) {
+                    handleUpdateTask(editingTask.id);
+                  } else {
+                    handleCreateTask(addingTaskCategory);
+                  }
+                }}
+                className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition"
+              >
+                Save
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
