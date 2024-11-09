@@ -3,7 +3,7 @@
 Navigate to the frontend directory and start the React application:
 
 ```bash
-cd frontend
+npm install multer
 npm start
 ```
 The frontend application will run on http://localhost:3000.

@@ -37,6 +37,9 @@ const upload = multer({ storage: storage });
 // Endpoint to fetch a user by ID
 app.get('/api/user/:id', authenticateToken, async (req, res) => {
   const { id } = req.params;
+  if (!id) {
+    return res.status(400).json({ error: 'User ID is required' });
+  }
   console.log(`Fetching user with ID: ${id}`);
   try {
     const result = await pool.query('SELECT id, full_name, username, email, avatar FROM users WHERE id = $1', [id]);
@@ -44,7 +47,7 @@ app.get('/api/user/:id', authenticateToken, async (req, res) => {
       return res.status(404).json({ error: 'User not found' });
     }
     const user = result.rows[0];
-    // Convert the avatar buffer to a base64 string
+    // Convert the avatar buffer to a base64 string if it exists
     if (user.avatar) {
       user.avatar = user.avatar.toString('base64');
     }
@@ -67,8 +70,11 @@ app.post('/api/register', async (req, res) => {
 
   const hashedPassword = await bcrypt.hash(password, 10);
   try {
+    // Convert email to lowercase
+    const lowerCaseEmail = email.toLowerCase();
+
     // Check if email is already registered
-    const emailExists = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+    const emailExists = await pool.query('SELECT * FROM users WHERE email = $1', [lowerCaseEmail]);
     if (emailExists.rows.length > 0) {
       return res.status(400).json({ error: 'Email is already registered' });
     }
@@ -82,7 +88,7 @@ app.post('/api/register', async (req, res) => {
     // Register the user
     const result = await pool.query(
       'INSERT INTO users (full_name, username, email, password) VALUES ($1, $2, $3, $4) RETURNING id',
-      [full_name, username, email, hashedPassword]
+      [full_name, username, lowerCaseEmail, hashedPassword]
     );
     const user = result.rows[0];
 
@@ -102,7 +108,7 @@ app.post('/api/login', async (req, res) => {
   try {
     let result;
     if (identifier.includes('@')) {
-      result = await pool.query('SELECT * FROM users WHERE email = $1', [identifier]);
+      result = await pool.query('SELECT * FROM users WHERE LOWER(email) = LOWER($1)', [identifier]);
     } else {
       result = await pool.query('SELECT * FROM users WHERE username = $1', [identifier]);
     }

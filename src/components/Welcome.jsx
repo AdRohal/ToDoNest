@@ -1,8 +1,13 @@
+import React, { useEffect } from 'react';
 import '../styles/Welcome.css';
 import { useNavigate } from 'react-router-dom';
 
 function Welcome({ user }) {
   const navigate = useNavigate();
+
+  useEffect(() => {
+    document.title = 'Welcome - ToDoNest';
+  }, []);
 
   const handleGoToTodoList = () => {
     navigate('/todo-list');

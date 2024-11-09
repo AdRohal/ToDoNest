@@ -3,7 +3,6 @@ import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
-import BackgroundWrapper from './BackgroundWrapper';
 
 const Login = ({ setUser }) => {
   const [identifier, setIdentifier] = useState('');
@@ -17,12 +16,12 @@ const Login = ({ setUser }) => {
     setError('');
     try {
       console.log('Attempting to log in with identifier:', identifier);
-      const response = await axios.post('http://localhost:5000/api/login', { identifier, password });
+      const response = await axios.post('http://localhost:5000/api/login', { identifier: identifier.trim(), password });
       const { token, userId } = response.data;
       console.log('Login successful, token:', token, 'userId:', userId);
       localStorage.setItem('token', token);
       localStorage.setItem('userId', userId);
-
+  
       const userResponse = await axios.get(`http://localhost:5000/api/user/${userId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -41,7 +40,6 @@ const Login = ({ setUser }) => {
   };
 
   return (
-    <BackgroundWrapper>
       <div className="bg-[#10082b] p-8 rounded shadow-md w-full max-w-md text-white border border-white">
         <h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
         {error && <div className="mb-4 text-red-500">{error}</div>}
@@ -95,7 +93,6 @@ const Login = ({ setUser }) => {
           </div>
         </form>
       </div>
-    </BackgroundWrapper>
   );
 };
 

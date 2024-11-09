@@ -4,7 +4,6 @@ import '../styles/App.css';
 import { useNavigate, Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
-import BackgroundWrapper from './BackgroundWrapper';
 
 function CreateAccount() {
   const [fullName, setFullName] = useState('');
@@ -49,7 +48,6 @@ function CreateAccount() {
   };
 
   return (
-    <BackgroundWrapper>
       <div className="bg-[#10082b] p-8 rounded shadow-md w-full max-w-md text-white border border-white">
         <h2 className="text-2xl font-bold mb-6 text-center">Create Account</h2>
         {message && <div className="mb-4 text-green-500">{message}</div>}
@@ -133,7 +131,6 @@ function CreateAccount() {
           </div>
         </form>
       </div>
-    </BackgroundWrapper>
   );
 }
 

@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import BackgroundWrapper from './BackgroundWrapper';
 
 function Profile() {
   const [fullName, setFullName] = useState('');
@@ -12,10 +11,12 @@ function Profile() {
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   const [isEditMode, setIsEditMode] = useState(false);
+  const fileInputRef = useRef(null);
   const userId = localStorage.getItem('userId');
   const navigate = useNavigate();
 
   useEffect(() => {
+    document.title = 'Profile - ToDoNest';
     if (!userId) {
       navigate('/login');
       return;
@@ -37,6 +38,7 @@ function Profile() {
         }
       } catch (err) {
         console.error('Failed to fetch user profile', err);
+        setError('Failed to fetch user profile.');
       }
     };
 
@@ -93,105 +95,116 @@ function Profile() {
     setIsEditMode(!isEditMode);
   };
 
+  const handleImageClick = () => {
+    if (isEditMode) {
+      fileInputRef.current.click();
+    }
+  };
+
   return (
-    <BackgroundWrapper>
-      <div className="bg-[#10082b] rounded shadow-md p-8 w-[1000px] text-white border border-white">
-        <h2 className="text-2xl font-bold mb-6 text-center">Profile Management</h2>
-        {message && <div className="mb-4 text-green-500">{message}</div>}
-        {error && <div className="mb-4 text-red-500">{error}</div>}
-        <div className="flex flex-col items-center">
-          <div className="mb-4">
-            <img
-              id="profile-pic"
-              src={avatarPreview || 'default-avatar.png'}
-              alt="Avatar"
-              className="w-24 h-24 rounded-full"
-            />
-          </div>
+    <div className="bg-[#10082b] rounded shadow-md p-8 w-[1000px] text-white border border-white">
+      <h2 className="text-2xl font-bold mb-6 text-center">Profile Management</h2>
+      {message && <div className="mb-4 text-green-500">{message}</div>}
+      {error && <div className="mb-4 text-red-500">{error}</div>}
+      <div className="flex flex-col items-center">
+        <div className="mb-4">
+          <img
+            id="profile-pic"
+            src={avatarPreview || 'default-avatar.png'}
+            alt="Avatar"
+            className="w-32 h-32 md:w-48 md:h-48 rounded-full object-cover mx-auto cursor-pointer"
+            onClick={handleImageClick}
+          />
+          <input
+            type="file"
+            ref={fileInputRef}
+            className="hidden"
+            onChange={handleAvatarChange}
+          />
+        </div>
+        <div className="mb-4 w-full">
+          <label className="block text-gray-300 text-sm font-bold mb-2" htmlFor="fullName">
+            Full Name
+          </label>
+          <input
+            type="text"
+            id="fullName"
+            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            placeholder="Full Name"
+            value={fullName}
+            onChange={(e) => setFullName(e.target.value)}
+            disabled={!isEditMode}
+          />
+        </div>
+        <div className="mb-4 w-full">
+          <label className="block text-gray-300 text-sm font-bold mb-2" htmlFor="username">
+            Username
+          </label>
+          <input
+            type="text"
+            id="username"
+            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            placeholder="Username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            disabled={!isEditMode}
+          />
+        </div>
+        <div className="mb-4 w-full">
+          <label className="block text-gray-300 text-sm font-bold mb-2" htmlFor="email">
+            Email
+          </label>
+          <input
+            type="email"
+            id="email"
+            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            disabled={!isEditMode}
+          />
+        </div>
+        {isEditMode && (
           <div className="mb-4 w-full">
-            <label className="block text-gray-300 text-sm font-bold mb-2" htmlFor="fullName">
-              Full Name
+            <label className="hidden" htmlFor="avatar">
+              Upload New Avatar
             </label>
             <input
-              type="text"
-              id="fullName"
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              placeholder="Full Name"
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
-              disabled={!isEditMode}
+              type="file"
+              id="avatar"
+              className="hidden"
+              onChange={handleAvatarChange}
             />
-          </div>
-          <div className="mb-4 w-full">
-            <label className="block text-gray-300 text-sm font-bold mb-2" htmlFor="username">
-              Username
-            </label>
-            <input
-              type="text"
-              id="username"
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              placeholder="Username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              disabled={!isEditMode}
-            />
-          </div>
-          <div className="mb-4 w-full">
-            <label className="block text-gray-300 text-sm font-bold mb-2" htmlFor="email">
-              Email
-            </label>
-            <input
-              type="email"
-              id="email"
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              disabled={!isEditMode}
-            />
-          </div>
-          {isEditMode && (
-            <div className="mb-4 w-full">
-              <label className="block text-gray-300 text-sm font-bold mb-2" htmlFor="avatar">
-                Upload New Avatar
-              </label>
-              <input
-                type="file"
-                id="avatar"
-                className="hidden"
-                onChange={handleAvatarChange}
-              />
-              <button
-                type="button"
-                id="avatarUploadBtn"
-                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                onClick={() => document.getElementById('avatar').click()}
-              >
-                Choose Avatar
-              </button>
-            </div>
-          )}
-          <div className="flex items-center justify-between w-full">
             <button
               type="button"
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-              onClick={toggleEditMode}
+              id="avatarUploadBtn"
+              className="hidden"
+              onClick={() => document.getElementById('avatar').click()}
             >
-              {isEditMode ? 'Cancel' : 'Edit'}
+              Choose Avatar
             </button>
-            {isEditMode && (
-              <button
-                type="submit"
-                className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                onClick={handleProfileSubmit}
-              >
-                Save
-              </button>
-            )}
           </div>
+        )}
+        <div className="flex items-center justify-between w-full">
+          <button
+            type="button"
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+            onClick={toggleEditMode}
+          >
+            {isEditMode ? 'Cancel' : 'Edit'}
+          </button>
+          {isEditMode && (
+            <button
+              type="submit"
+              className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+              onClick={handleProfileSubmit}
+            >
+              Save
+            </button>
+          )}
         </div>
       </div>
-    </BackgroundWrapper>
+    </div>
   );
 }
 

@@ -17,6 +17,8 @@ function TodoList() {
   const [isPopupVisible, setIsPopupVisible] = useState(false); // New state for popup visibility
 
   useEffect(() => {
+    document.title = 'Todo List - ToDoNest';
+    
     const fetchCategories = async () => {
       try {
         const response = await axios.get('http://localhost:5000/api/categories', {
