@@ -81,8 +81,7 @@ Navigate to the backend directory and start the Express server:
 
 ```bash
 cd backend
-npm install
-npm start
+node index.js
 ```
 The backend server will run on http://localhost:5000.
 
