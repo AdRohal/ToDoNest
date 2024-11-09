@@ -1,4 +1,7 @@
 # ToDoNest
+
+ToDoNest is a web app where users can sign up, log in, and manage their personal to-do lists. ✅ The project is still in progress, with more features on the way! 🚀
+
 ### Frontend
 Navigate to the frontend directory and start the React application:
 
