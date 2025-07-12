@@ -1,3 +1,4 @@
+
 const express = require('express');
 const cors = require('cors');
 const { Pool } = require('pg');
@@ -5,25 +6,33 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const multer = require('multer');
 
+require('dotenv').config();
+
 const app = express();
-app.use(cors());
+// اضبط CORS للسماح للفرونت إند فقط (غير ضروري إذا في تطوير)
+app.use(cors({
+  origin: [
+    'http://localhost:3000',
+    'https://your-frontend-url.vercel.app'
+  ],
+  credentials: true
+}));
 app.use(express.json());
 
-// PostgreSQL connection configuration
+// إعداد اتصال PostgreSQL باستخدام متغير البيئة DATABASE_URL مع SSL لـ Supabase
 const pool = new Pool({
-  user: 'postgres',
-  host: 'localhost',
-  database: 'todonest',
-  password: '5233',
-  port: 5432,
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false,
+  },
 });
 
-// Middleware to verify JWT token
+// Middleware للتحقق من JWT
 const authenticateToken = (req, res, next) => {
   const token = req.headers['authorization']?.split(' ')[1];
   if (!token) return res.sendStatus(401);
 
-  jwt.verify(token, 'your_jwt_secret', (err, user) => {
+  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
     if (err) return res.sendStatus(403);
     req.user = user;
     next();
@@ -93,7 +102,7 @@ app.post('/api/register', async (req, res) => {
     const user = result.rows[0];
 
     // Create a JWT token
-    const token = jwt.sign({ id: user.id }, 'your_jwt_secret', { expiresIn: '1h' });
+    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
     res.status(201).json({ token, userId: user.id });
   } catch (err) {
     console.error('Error registering user:', err);
@@ -121,7 +130,7 @@ app.post('/api/login', async (req, res) => {
     if (!isMatch) {
       return res.status(400).json({ error: 'Invalid credentials' });
     }
-    const token = jwt.sign({ id: user.id }, 'your_jwt_secret', { expiresIn: '1h' });
+    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
     res.json({ token, userId: user.id });
   } catch (err) {
     console.error('Error logging in user:', err);
