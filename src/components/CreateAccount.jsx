@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import './LoadingPopup.css';
 import axios from 'axios';
 import '../styles/App.css';
 import { useNavigate, Link } from 'react-router-dom';
@@ -13,16 +14,19 @@ function CreateAccount() {
   const [showPassword, setShowPassword] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMessage('');
     setError('');
+    setLoading(true);
 
     // Check if all fields are filled
     if (!fullName || !username || !email || !password) {
       setError('All fields are required');
+      setLoading(false);
       return;
     }
 
@@ -44,10 +48,21 @@ function CreateAccount() {
       } else {
         setError('An error occurred. Please try again.');
       }
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
+    <>
+      {loading && (
+        <div className="loading-popup-overlay">
+          <div className="loading-popup">
+            <div className="spinner"></div>
+            <div className="loading-text">Loading...</div>
+          </div>
+        </div>
+      )}
       <div className="bg-[#10082b] p-8 rounded shadow-md w-full max-w-md text-white border border-white">
         <h2 className="text-2xl font-bold mb-6 text-center">Create Account</h2>
         {message && <div className="mb-4 text-green-500">{message}</div>}
@@ -119,6 +134,7 @@ function CreateAccount() {
             <button
               type="submit"
               className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-3 rounded focus:outline-none focus:shadow-outline"
+              disabled={loading}
             >
               Create Account
             </button>
@@ -131,6 +147,7 @@ function CreateAccount() {
           </div>
         </form>
       </div>
+    </>
   );
 }
 

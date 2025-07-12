@@ -1,0 +1,44 @@
+/* Loading popup overlay styles */
+.loading-popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(16, 8, 43, 0.7); /* semi-transparent dark background */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.loading-popup {
+  background: rgba(30, 30, 50, 0.95);
+  border-radius: 16px;
+  padding: 40px 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 0 4px 32px rgba(0,0,0,0.2);
+}
+
+.spinner {
+  border: 6px solid #f3f3f3;
+  border-top: 6px solid #4c3f75;
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  animation: spin 1s linear infinite;
+  margin-bottom: 16px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-text {
+  color: #fff;
+  font-size: 1.2rem;
+  margin-top: 8px;
+}

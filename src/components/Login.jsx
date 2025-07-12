@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import './LoadingPopup.css';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -9,11 +10,13 @@ const Login = ({ setUser }) => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setLoading(true);
     try {
       console.log('Attempting to log in with identifier:', identifier);
       const response = await axios.post('https://todonest-2n1a.onrender.com/api/login', { identifier: identifier.trim(), password });
@@ -36,10 +39,21 @@ const Login = ({ setUser }) => {
       } else {
         setError('An error occurred. Please try again.');
       }
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
+    <>
+      {loading && (
+        <div className="loading-popup-overlay">
+          <div className="loading-popup">
+            <div className="spinner"></div>
+            <div className="loading-text">Loading...</div>
+          </div>
+        </div>
+      )}
       <div className="bg-[#10082b] p-8 rounded shadow-md w-full max-w-md text-white border border-white">
         <h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
         {error && <div className="mb-4 text-red-500">{error}</div>}
@@ -84,6 +98,7 @@ const Login = ({ setUser }) => {
             <button
               type="submit"
               className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+              disabled={loading}
             >
               Sign In
             </button>
@@ -93,6 +108,7 @@ const Login = ({ setUser }) => {
           </div>
         </form>
       </div>
+    </>
   );
 };
 
