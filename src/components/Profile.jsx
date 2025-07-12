@@ -24,7 +24,7 @@ function Profile() {
 
     const fetchUserProfile = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/api/user/${userId}`, {
+        const response = await axios.get(`https://todonest-2n1a.onrender.com/api/user/${userId}`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
           },
@@ -67,7 +67,7 @@ function Profile() {
     };
 
     try {
-      await axios.put(`http://localhost:5000/api/user/${userId}`, profileData, {
+      await axios.put(`https://todonest-2n1a.onrender.com/api/user/${userId}`, profileData, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
@@ -76,7 +76,7 @@ function Profile() {
       if (avatar) {
         const formData = new FormData();
         formData.append('avatar', avatar);
-        await axios.post(`http://localhost:5000/api/user/${userId}/avatar`, formData, {
+        await axios.post(`https://todonest-2n1a.onrender.com/api/user/${userId}/avatar`, formData, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
             'Content-Type': 'multipart/form-data',

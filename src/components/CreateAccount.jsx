@@ -27,7 +27,7 @@ function CreateAccount() {
     }
 
     try {
-      const response = await axios.post('http://localhost:5000/api/register', {
+      const response = await axios.post('https://todonest-2n1a.onrender.com/api/register', {
         full_name: fullName,
         username,
         email,

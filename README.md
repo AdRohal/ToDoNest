@@ -1,3 +1,11 @@
+# Localhost Version
+
+If you want to run the project entirely on localhost (with all API URLs and settings for local development), check out the branch:
+
+**AdRohal/LocalHostCode**
+
+This branch contains the code and configuration for running both frontend and backend on your local machine using localhost URLs.
+
 # ToDoNest
 
 Introducing ToDoNest – a fully developed web app where users can sign up, log in, and efficiently manage their personal to-do lists. With features to organize tasks and enhance productivity, ToDoNest is ready to use. More updates and enhancements may come, but it’s fully functional and ready to make task management easier!
@@ -76,7 +84,8 @@ This section has moved here: https://facebook.github.io/create-react-app/docs/ma
 Advanced Configuration
 This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration ```
 
-### Backend
+
+### Backend (Local)
 Navigate to the backend directory and start the Express server:
 
 ```bash
@@ -84,6 +93,13 @@ cd backend
 node index.js
 ```
 The backend server will run on http://localhost:5000.
+
+### Backend (Production)
+The backend is deployed on Render and available at:
+
+https://todonest-2n1a.onrender.com
+
+Update your frontend API URLs to use this production endpoint for deployment or production use.
 
 ### Database
 Ensure PostgreSQL is running and create the `users` table:

@@ -16,13 +16,13 @@ const Login = ({ setUser }) => {
     setError('');
     try {
       console.log('Attempting to log in with identifier:', identifier);
-      const response = await axios.post('http://localhost:5000/api/login', { identifier: identifier.trim(), password });
+      const response = await axios.post('https://todonest-2n1a.onrender.com/api/login', { identifier: identifier.trim(), password });
       const { token, userId } = response.data;
       console.log('Login successful, token:', token, 'userId:', userId);
       localStorage.setItem('token', token);
       localStorage.setItem('userId', userId);
   
-      const userResponse = await axios.get(`http://localhost:5000/api/user/${userId}`, {
+      const userResponse = await axios.get(`https://todonest-2n1a.onrender.com/api/user/${userId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

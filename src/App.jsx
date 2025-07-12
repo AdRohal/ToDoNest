@@ -28,7 +28,7 @@ function App() {
       const token = localStorage.getItem('token');
       if (userId && token) {
         try {
-          const response = await axios.get(`http://localhost:5000/api/user/${userId}`, {
+          const response = await axios.get(`https://todonest-2n1a.onrender.com/api/user/${userId}`, {
             headers: {
               Authorization: `Bearer ${token}`,
             },

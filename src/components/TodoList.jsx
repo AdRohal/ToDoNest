@@ -21,7 +21,7 @@ function TodoList() {
     
     const fetchCategories = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/categories', {
+        const response = await axios.get('https://todonest-2n1a.onrender.com/api/categories', {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
           },
@@ -40,7 +40,7 @@ function TodoList() {
 
     try {
       const response = await axios.post(
-        'http://localhost:5000/api/category',
+        'https://todonest-2n1a.onrender.com/api/category',
         { name: newCategoryName },
         {
           headers: {
@@ -64,7 +64,7 @@ function TodoList() {
 
     try {
       const response = await axios.post(
-        'http://localhost:5000/api/task',
+        'https://todonest-2n1a.onrender.com/api/task',
         { categoryId, title: newTaskTitle, description: newTaskDescription },
         {
           headers: {
@@ -96,7 +96,7 @@ function TodoList() {
       const updatedTask = { ...task, completed: !task.completed };
 
       await axios.put(
-        `http://localhost:5000/api/task/${taskId}`,
+        `https://todonest-2n1a.onrender.com/api/task/${taskId}`,
         { completed: updatedTask.completed },
         {
           headers: {
@@ -123,7 +123,7 @@ function TodoList() {
 
   const handleDeleteCategory = async (categoryId) => {
     try {
-      await axios.delete(`http://localhost:5000/api/category/${categoryId}`, {
+      await axios.delete(`https://todonest-2n1a.onrender.com/api/category/${categoryId}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
@@ -136,7 +136,7 @@ function TodoList() {
 
   const handleDeleteTask = async (taskId) => {
     try {
-      await axios.delete(`http://localhost:5000/api/task/${taskId}`, {
+      await axios.delete(`https://todonest-2n1a.onrender.com/api/task/${taskId}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
@@ -165,7 +165,7 @@ function TodoList() {
 
     try {
       const response = await axios.put(
-        `http://localhost:5000/api/category/${categoryId}`,
+        `https://todonest-2n1a.onrender.com/api/category/${categoryId}`,
         { name: editedCategoryName },
         {
           headers: {
