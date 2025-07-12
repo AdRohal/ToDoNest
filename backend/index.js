@@ -9,11 +9,10 @@ const multer = require('multer');
 require('dotenv').config();
 
 const app = express();
-// اضبط CORS للسماح للفرونت إند فقط (غير ضروري إذا في تطوير)
+// اضبط CORS للسماح فقط للفرونت إند في الإنتاج
 app.use(cors({
   origin: [
-    'http://localhost:3000',
-    'https://your-frontend-url.vercel.app'
+    'https://todo-nest-brown.vercel.app'
   ],
   credentials: true
 }));
