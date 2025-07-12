@@ -9,7 +9,7 @@ const multer = require('multer');
 require('dotenv').config();
 
 const app = express();
-// اضبط CORS للسماح فقط للفرونت إند في الإنتاج
+// Configure CORS to allow only the production frontend
 app.use(cors({
   origin: [
     'https://todo-nest-brown.vercel.app'
@@ -18,7 +18,7 @@ app.use(cors({
 }));
 app.use(express.json());
 
-// إعداد اتصال PostgreSQL باستخدام متغير البيئة DATABASE_URL مع SSL لـ Supabase
+// Set up PostgreSQL connection using the DATABASE_URL environment variable with SSL for Supabase
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: {
@@ -26,7 +26,7 @@ const pool = new Pool({
   },
 });
 
-// Middleware للتحقق من JWT
+// JWT authentication middleware
 const authenticateToken = (req, res, next) => {
   const token = req.headers['authorization']?.split(' ')[1];
   if (!token) return res.sendStatus(401);
